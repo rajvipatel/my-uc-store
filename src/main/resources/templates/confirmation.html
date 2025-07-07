@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - UC Book Store</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">
+                <i class="fas fa-book-open me-2"></i>UC Book Store
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">Home</a>
+                    </li>
+                </ul>
+                
+                <!-- Cart Link -->
+                <a th:href="@{/cart}" class="btn btn-outline-light">
+                    <i class="fas fa-shopping-cart"></i>
+                    Cart
+                    <span class="cart-badge" th:if="${cartItemCount > 0}" th:text="${cartItemCount}"></span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Order Confirmation -->
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="confirmation-card">
+                    <div class="confirmation-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    
+                    <h1 class="display-4 mb-4">Order Confirmed!</h1>
+                    <p class="lead">Thank you for your purchase. Your order has been successfully placed.</p>
+                    
+                    <div class="order-number" th:text="${orderNumber}"></div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-user me-2"></i>Customer Information</h5>
+                            <p class="mb-1" th:text="${customer.fullName}"></p>
+                            <p class="mb-1" th:text="${customer.email}"></p>
+                            <p class="mb-3" th:text="${customer.phone}"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-truck me-2"></i>Shipping Address</h5>
+                            <p class="mb-1" th:text="${customer.fullAddress}"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5><i class="fas fa-calendar me-2"></i>Order Details</h5>
+                            <p class="mb-1">Order Date: <span th:text="${orderDate}"></span></p>
+                            <p class="mb-3">Payment Method: Credit Card ending in <span th:text="${#strings.substring(customer.cardNumber, 12, 16)}"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="row justify-content-center mt-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-receipt me-2"></i>Order Summary</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Order Items -->
+                        <div th:each="item : ${cartItems}" class="d-flex align-items-center py-3 border-bottom">
+                            <img th:src="${item.book.imageUrl}" th:alt="${item.book.title}" 
+                                 class="me-3" style="width: 60px; height: 90px; object-fit: cover; border-radius: 5px;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1" th:text="${item.book.title}"></h6>
+                                <p class="text-muted mb-1" th:text="'by ' + ${item.book.author}"></p>
+                                <small class="text-muted">Quantity: <span th:text="${item.quantity}"></span></small>
+                            </div>
+                            <div class="text-end">
+                                <p class="mb-0 fw-bold" th:text="'$' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}"></p>
+                                <small class="text-muted" th:text="'$' + ${#numbers.formatDecimal(item.book.price, 1, 2)} + ' each'"></small>
+                            </div>
+                        </div>
+                        
+                        <!-- Pricing Summary -->
+                        <div class="mt-4">
+                            <div class="row">
+                                <div class="col-md-6 offset-md-6">
+                                    <div class="summary-row">
+                                        <span>Subtotal:</span>
+                                        <span th:text="'$' + ${#numbers.formatDecimal(cartTotal, 1, 2)}"></span>
+                                    </div>
+                                    
+                                    <div class="summary-row">
+                                        <span>Tax (8.5%):</span>
+                                        <span th:text="'$' + ${#numbers.formatDecimal(tax, 1, 2)}"></span>
+                                    </div>
+                                    
+                                    <div class="summary-row">
+                                        <span>Shipping:</span>
+                                        <span th:if="${shipping > 0}" th:text="'$' + ${#numbers.formatDecimal(shipping, 1, 2)}"></span>
+                                        <span th:if="${shipping == 0}" class="text-success">FREE</span>
+                                    </div>
+                                    
+                                    <div class="summary-row total">
+                                        <span>Total Paid:</span>
+                                        <span th:text="'$' + ${#numbers.formatDecimal(finalTotal, 1, 2)}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="row justify-content-center mt-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i>What's Next?</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 text-center mb-3">
+                                <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
+                                <h6>Confirmation Email</h6>
+                                <p class="small text-muted">You'll receive an order confirmation email shortly at <span th:text="${customer.email}"></span></p>
+                            </div>
+                            <div class="col-md-4 text-center mb-3">
+                                <i class="fas fa-box fa-2x text-warning mb-2"></i>
+                                <h6>Processing</h6>
+                                <p class="small text-muted">Your order will be processed and prepared for shipping within 1-2 business days</p>
+                            </div>
+                            <div class="col-md-4 text-center mb-3">
+                                <i class="fas fa-truck fa-2x text-success mb-2"></i>
+                                <h6>Shipping</h6>
+                                <p class="small text-muted">
+                                    <span th:if="${shipping > 0}">Standard shipping (5-7 business days)</span>
+                                    <span th:if="${shipping == 0}">Free shipping (3-5 business days)</span>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Note:</strong> This is a demo order. No actual books will be shipped and no payment has been processed.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row justify-content-center mt-4 mb-5">
+            <div class="col-lg-8 text-center">
+                <a th:href="@{/}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-home me-2"></i>Continue Shopping
+                </a>
+                <button class="btn btn-outline-secondary btn-lg" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>Print Receipt
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-book-open me-2"></i>UC Book Store</h5>
+                    <p class="mb-0">Your trusted online bookstore for all your reading needs.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">
+                        <a href="#" class="me-3">About Us</a>
+                        <a href="#" class="me-3">Contact</a>
+                        <a href="#" class="me-3">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                    </p>
+                    <p class="mb-0 mt-2">
+                        <small>&copy; 2024 UC Book Store. All rights reserved.</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/cart.js}"></script>
+</body>
+</html>
