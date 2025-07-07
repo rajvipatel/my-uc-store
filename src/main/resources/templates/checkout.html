@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - UC Book Store</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">
+                <i class="fas fa-book-open me-2"></i>UC Book Store
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">Home</a>
+                    </li>
+                </ul>
+                
+                <!-- Cart Link -->
+                <a th:href="@{/cart}" class="btn btn-outline-light">
+                    <i class="fas fa-shopping-cart"></i>
+                    Cart
+                    <span class="cart-badge" th:if="${cartItemCount > 0}" th:text="${cartItemCount}"></span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-4">
+                    <i class="fas fa-credit-card me-3"></i>Checkout
+                </h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/cart}">Shopping Cart</a></li>
+                        <li class="breadcrumb-item active">Checkout</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Checkout Form -->
+            <div class="col-lg-8">
+                <form th:action="@{/checkout/process}" th:object="${customer}" method="post" 
+                      class="checkout-form" id="checkout-form">
+                    
+                    <!-- Customer Information -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-user me-2"></i>Customer Information</h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">First Name *</label>
+                                <input type="text" class="form-control" th:field="*{firstName}" 
+                                       th:class="${#fields.hasErrors('firstName')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('firstName')}" class="invalid-feedback">
+                                    <span th:errors="*{firstName}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" th:field="*{lastName}"
+                                       th:class="${#fields.hasErrors('lastName')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('lastName')}" class="invalid-feedback">
+                                    <span th:errors="*{lastName}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" th:field="*{email}"
+                                       th:class="${#fields.hasErrors('email')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback">
+                                    <span th:errors="*{email}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" th:field="*{phone}" placeholder="1234567890"
+                                       th:class="${#fields.hasErrors('phone')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('phone')}" class="invalid-feedback">
+                                    <span th:errors="*{phone}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-truck me-2"></i>Shipping Address</h4>
+                        
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Street Address *</label>
+                            <input type="text" class="form-control" th:field="*{address}"
+                                   th:class="${#fields.hasErrors('address')} ? 'form-control is-invalid' : 'form-control'">
+                            <div th:if="${#fields.hasErrors('address')}" class="invalid-feedback">
+                                <span th:errors="*{address}"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label">City *</label>
+                                <input type="text" class="form-control" th:field="*{city}"
+                                       th:class="${#fields.hasErrors('city')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('city')}" class="invalid-feedback">
+                                    <span th:errors="*{city}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="state" class="form-label">State *</label>
+                                <input type="text" class="form-control" th:field="*{state}"
+                                       th:class="${#fields.hasErrors('state')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('state')}" class="invalid-feedback">
+                                    <span th:errors="*{state}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="zipCode" class="form-label">ZIP Code *</label>
+                                <input type="text" class="form-control" th:field="*{zipCode}" placeholder="12345"
+                                       th:class="${#fields.hasErrors('zipCode')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('zipCode')}" class="invalid-feedback">
+                                    <span th:errors="*{zipCode}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Information -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-credit-card me-2"></i>Payment Information</h4>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Demo Mode:</strong> This is a mock checkout. No real payment will be processed.
+                            Use test card number: 4111111111111111
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="cardNumber" class="form-label">Card Number *</label>
+                            <input type="text" class="form-control" th:field="*{cardNumber}" 
+                                   placeholder="4111111111111111" maxlength="16"
+                                   th:class="${#fields.hasErrors('cardNumber')} ? 'form-control is-invalid' : 'form-control'">
+                            <div th:if="${#fields.hasErrors('cardNumber')}" class="invalid-feedback">
+                                <span th:errors="*{cardNumber}"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="expiryDate" class="form-label">Expiry Date *</label>
+                                <input type="text" class="form-control" th:field="*{expiryDate}" 
+                                       placeholder="MM/YY" maxlength="5"
+                                       th:class="${#fields.hasErrors('expiryDate')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('expiryDate')}" class="invalid-feedback">
+                                    <span th:errors="*{expiryDate}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cvv" class="form-label">CVV *</label>
+                                <input type="text" class="form-control" th:field="*{cvv}" 
+                                       placeholder="123" maxlength="3"
+                                       th:class="${#fields.hasErrors('cvv')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('cvv')}" class="invalid-feedback">
+                                    <span th:errors="*{cvv}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-lock me-2"></i>Complete Order
+                        </button>
+                        <a th:href="@{/cart}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Cart
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+                <div class="cart-summary">
+                    <h4 class="mb-4">Order Summary</h4>
+                    
+                    <!-- Order Items -->
+                    <div class="mb-4">
+                        <div th:each="item : ${cartItems}" class="d-flex align-items-center mb-3">
+                            <img th:src="${item.book.imageUrl}" th:alt="${item.book.title}" 
+                                 class="me-3" style="width: 50px; height: 75px; object-fit: cover; border-radius: 5px;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1" th:text="${item.book.title}"></h6>
+                                <small class="text-muted" th:text="'Qty: ' + ${item.quantity}"></small>
+                            </div>
+                            <span class="fw-bold" th:text="'$' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}"></span>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Pricing Summary -->
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span th:text="'$' + ${#numbers.formatDecimal(cartTotal, 1, 2)}"></span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Tax (8.5%):</span>
+                        <span th:text="'$' + ${#numbers.formatDecimal(tax, 1, 2)}"></span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Shipping:</span>
+                        <span th:if="${shipping > 0}" th:text="'$' + ${#numbers.formatDecimal(shipping, 1, 2)}"></span>
+                        <span th:if="${shipping == 0}" class="text-success">FREE</span>
+                    </div>
+                    
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span th:text="'$' + ${#numbers.formatDecimal(finalTotal, 1, 2)}"></span>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="d-flex align-items-center text-muted">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            <small>Your payment information is secure</small>
+                        </div>
+                        <div class="d-flex align-items-center text-muted mt-2">
+                            <i class="fas fa-truck me-2"></i>
+                            <small>Free shipping on orders over $50</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-book-open me-2"></i>UC Book Store</h5>
+                    <p class="mb-0">Your trusted online bookstore for all your reading needs.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">
+                        <a href="#" class="me-3">About Us</a>
+                        <a href="#" class="me-3">Contact</a>
+                        <a href="#" class="me-3">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                    </p>
+                    <p class="mb-0 mt-2">
+                        <small>&copy; 2024 UC Book Store. All rights reserved.</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/cart.js}"></script>
+</body>
+</html>
